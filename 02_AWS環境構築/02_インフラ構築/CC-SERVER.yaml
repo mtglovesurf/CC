@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+
+  MachineImage:
+    Type: String
+    Default: "ami-0eb43db8bdeafd657"
+
+  InstanceType:
+    Type: String
+    Default: "t2.micro"
+  
+  SubnetId:
+    Type: String
+    Default: "subnet-xxxxxx"
+
+  SecurityGroupId:
+    Type: String
+    Default: "sg-xxxxxx"
+
+Resources:
+
+  EC2InstanceForRedmine:
+      Type: AWS::EC2::Instance
+      Properties:
+        ImageId: !Ref MachineImage
+        InstanceType: !Ref InstanceType
+        SubnetId: !Ref SubnetId
+        SecurityGroupIds:
+          - !Ref SecurityGroupId
+        Tags:
+          - Key: Name
+            Value: "CC-EC2-REDMINE"
+
+Outputs:
+
+  EC2InstanceIdOfRedmine:
+    Description: "Instance ID"
+    Value: !Ref EC2InstanceForRedmine
+    Export:
+      Name: "CC-EC2-REDMINE"

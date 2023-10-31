@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Id": "default",
+  "Statement": [
+    {
+      "Sid": "ZKS-IT-RESOURCE-POLICY1",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "connect.amazonaws.com"
+      },
+      "Action": "lambda:InvokeFunction",
+      "Resource": "arn:aws:lambda:ap-northeast-1:309956249298:function:CC-PUT-CONTACT-LAMBDA",
+      "Condition": {
+        "ArnLike": {
+          "AWS:SourceArn": "arn:aws:connect:ap-northeast-1:309956249298:instance/866d554f-31fb-4c23-ba12-b348db2bd0ee"
+        }
+      }
+    }
+  ]
+}

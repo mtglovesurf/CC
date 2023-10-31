@@ -1,0 +1,8 @@
+{
+    "TableName": "CONTACT",
+    "Key": {
+        "contact_id": {
+            "S": "test"
+        }
+    }
+}

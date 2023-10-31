@@ -1,0 +1,4 @@
+﻿first name,last name,email address,secondary email,mobile,password,user login,routing profile name,security_profile_name_1|security_profile_name_2,user_hierarchy_1|user_hierarchy_2,phone type (soft/desk),phone number,soft phone auto accept (yes/no),ACW timeout (seconds),tags
+耕一,秦,,,,Zks0155332200,hata,有人応答,Agent,,soft,,no,0,
+圭佑,庄司,,,,Zks0155332200,shoji,有人応答,Agent,,soft,,no,0,
+エージェント,自動応答,,,,Zks0155332200,auto,自動応答,Agent,,soft,,yes,1,

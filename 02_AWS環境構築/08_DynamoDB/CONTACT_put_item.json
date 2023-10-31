@@ -1,0 +1,14 @@
+{
+    "TableName": "CONTACT",
+    "Item": {
+        "contact_id": {
+            "S": "test"
+        },
+        "phone_number": {
+            "S": "1544752292"
+        },
+        "ticket_id": {
+            "N": "30"
+        }
+    }
+}

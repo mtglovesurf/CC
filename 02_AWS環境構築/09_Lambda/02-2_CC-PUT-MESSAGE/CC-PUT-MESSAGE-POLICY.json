@@ -1,0 +1,32 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "1",
+			"Effect": "Allow",
+			"Action": "logs:CreateLogGroup",
+			"Resource": "arn:aws:logs:ap-northeast-1:309956249298:*"
+		},
+		{
+			"Sid": "2",
+			"Effect": "Allow",
+			"Action": [
+				"logs:CreateLogStream",
+				"logs:PutLogEvents"
+			],
+			"Resource": "arn:aws:logs:ap-northeast-1:309956249298:log-group:/aws/lambda/CC-PUT-MESSAGE:*"
+		},
+		{
+			"Sid": "3",
+			"Effect": "Allow",
+			"Action": [
+				"s3:GetObject",
+				"dynamodb:PutItem",
+				"dynamodb:GetItem",
+				"ssm:GetParameters",
+				"ssm:GetParameter"
+			],
+			"Resource": "*"
+		}
+	]
+}

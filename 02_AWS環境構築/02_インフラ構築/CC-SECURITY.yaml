@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+
+  VpcId:
+    Type: String
+    Default: "vpc-xxxxxx"
+
+Resources:
+
+  SecurityGroupForEIC:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        VpcId: !Ref VpcId
+        GroupName: "EIC"        
+        GroupDescription: "Security Group for EIC"
+        SecurityGroupEgress:
+          - IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            CidrIp: 0.0.0.0/0
+        Tags:
+          - Key: Name
+            Value: "CC-SGP-EIC"
+
+  SecurityGroupForLambda:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        VpcId: !Ref VpcId
+        GroupName: "Lambda"        
+        GroupDescription: "Security Group for Lambda"
+        SecurityGroupIngress:
+          - IpProtocol: -1
+            CidrIp: 0.0.0.0/0
+        SecurityGroupEgress:
+          - IpProtocol: -1
+            CidrIp: 0.0.0.0/0
+        Tags:
+          - Key: Name
+            Value: "CC-SGP-LAMBDA"
+
+  SecurityGroupForALB:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        VpcId: !Ref VpcId
+        GroupName: "ALB"        
+        GroupDescription: "Security Group for ALB"
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 443
+            ToPort: 443
+            CidrIp: 153.246.148.30/32
+            Description: "Office"
+          - IpProtocol: tcp
+            FromPort: 443
+            ToPort: 443
+            CidrIp: 221.186.163.126/32
+            Description: "Develop"
+        SecurityGroupEgress:
+          - IpProtocol: -1
+            CidrIp: 0.0.0.0/0
+        Tags:
+          - Key: Name
+            Value: "CC-SGP-ALB"
+
+  SecurityGroupForRedmine:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        VpcId: !Ref VpcId
+        GroupName: "Redmine"        
+        GroupDescription: "Security Group for Redmine"
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            SourceSecurityGroupId: !Ref SecurityGroupForEIC
+            Description: "EIC"
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            SourceSecurityGroupId: !Ref SecurityGroupForLambda
+            Description: "Lambda"
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            SourceSecurityGroupId: !Ref SecurityGroupForALB
+            Description: "ALB"
+        SecurityGroupEgress:
+          - IpProtocol: -1
+            CidrIp: 0.0.0.0/0
+        Tags:
+          - Key: Name
+            Value: "CC-SGP-REDMINE"
+
+Outputs:
+
+  SecurityGroupIdOfEIC:
+    Description: "Security Group for EIC"
+    Value: !Ref SecurityGroupForEIC
+    Export:
+      Name: "CC-SGP-EIC"
+  
+  SecurityGroupIdOfLambda:
+    Description: "Security Group for Lambda"
+    Value: !Ref SecurityGroupForLambda
+    Export:
+      Name: "CC-SGP-LAMBDA"
+
+  SecurityGroupIdOfALB:
+    Description: "Security Group for ALB"
+    Value: !Ref SecurityGroupForALB
+    Export:
+      Name: "CC-SGP-ALB"
+  
+  SecurityGroupIdOfRedmine:
+    Description: "Security Group for Redmine"
+    Value: !Ref SecurityGroupForRedmine
+    Export:
+      Name: "CC-SGP-REDMINE"
+

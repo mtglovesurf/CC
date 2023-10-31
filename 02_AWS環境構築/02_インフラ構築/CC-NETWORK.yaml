@@ -1,0 +1,217 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+
+# VPC Create
+  MainVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 172.16.0.0/16
+      Tags: 
+        - Key: Name
+          Value: "CC-VPC"
+
+# Internet Gateway Create
+  MainIGW:
+    Type: "AWS::EC2::InternetGateway"
+    Properties: 
+      Tags: 
+        - Key: Name
+          Value: "CC-IGW"
+
+# Internet Gateway Attach
+  Attach: 
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties: 
+      InternetGatewayId: !Ref MainIGW
+      VpcId: !Ref MainVpc
+
+# Subnet Create
+  PublicSubnetA: 
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      AvailabilityZone: "ap-northeast-1a"
+      CidrBlock: 172.16.1.0/24
+      VpcId: !Ref MainVpc
+      Tags: 
+        - Key: Name
+          Value: "CC-PUBLIC-SUBNET-A"
+  
+  PrivateSubnetA: 
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      AvailabilityZone: "ap-northeast-1a"
+      CidrBlock: 172.16.2.0/24
+      VpcId: !Ref MainVpc
+      Tags: 
+        - Key: Name
+          Value: "CC-PRIVATE-SUBNET-A"
+  
+  PublicSubnetC: 
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      AvailabilityZone: "ap-northeast-1c"
+      CidrBlock: 172.16.3.0/24
+      VpcId: !Ref MainVpc
+      Tags: 
+        - Key: Name
+          Value: "CC-PUBLIC-SUBNET-C"
+
+  PrivateSubnetC: 
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      AvailabilityZone: "ap-northeast-1c"
+      CidrBlock: 172.16.4.0/24
+      VpcId: !Ref MainVpc
+      Tags: 
+        - Key: Name
+          Value: "CC-PRIVATE-SUBNET-C"
+
+# Elastic IP Create
+  EIPazA: 
+    Type: "AWS::EC2::EIP"
+    Properties: 
+      Domain: MainVpc
+
+  EIPazC: 
+    Type: "AWS::EC2::EIP"
+    Properties: 
+      Domain: MainVpc
+
+# NAT Gateway Create
+  NATazA:
+    Type: "AWS::EC2::NatGateway"
+    Properties: 
+      AllocationId: !GetAtt EIPazA.AllocationId
+      SubnetId: !Ref PublicSubnetA
+      Tags:
+        - Key: Name
+          Value: "CC-NATGW-A"
+
+  NATazC:
+    Type: "AWS::EC2::NatGateway"
+    Properties: 
+      AllocationId: !GetAtt EIPazC.AllocationId
+      SubnetId: !Ref PublicSubnetC
+      Tags:
+        - Key: Name
+          Value: "CC-NATGW-C"
+
+# Route Table Create
+  PublicRouteTableA: 
+    Type: "AWS::EC2::RouteTable"
+    Properties: 
+      VpcId: !Ref MainVpc 
+      Tags: 
+        - Key: Name
+          Value: "CC-PUBLIC-ROUTE-TABLE-A"
+
+  PublicRouteTableC: 
+    Type: "AWS::EC2::RouteTable"
+    Properties: 
+      VpcId: !Ref MainVpc
+      Tags: 
+        - Key: Name
+          Value: "CC-PUBLIC-ROUTE-TABLE-C"
+
+  PrivateRouteTableA: 
+    Type: "AWS::EC2::RouteTable"
+    Properties: 
+      VpcId: !Ref MainVpc
+      Tags: 
+        - Key: Name
+          Value: "CC-PRIVATE-ROUTE-TABLE-A"
+
+  PrivateRouteTableC: 
+    Type: "AWS::EC2::RouteTable"
+    Properties: 
+      VpcId: !Ref MainVpc
+      Tags: 
+        - Key: Name
+          Value: "CC-PRIVATE-ROUTE-TABLE-C"
+
+# Routing
+  PublicRouteA: 
+    Type: "AWS::EC2::Route"
+    Properties: 
+      RouteTableId: !Ref PublicRouteTableA
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref MainIGW
+
+  PublicRouteC: 
+    Type: "AWS::EC2::Route"
+    Properties: 
+      RouteTableId: !Ref PublicRouteTableC
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref MainIGW
+
+  PrivateRouteA: 
+    Type: "AWS::EC2::Route"
+    Properties: 
+      RouteTableId: !Ref PrivateRouteTableA
+      DestinationCidrBlock: "0.0.0.0/0"
+      NatGatewayId: !Ref NATazA
+
+  PrivateRouteC: 
+    Type: "AWS::EC2::Route"
+    Properties: 
+      RouteTableId: !Ref PrivateRouteTableC
+      DestinationCidrBlock: "0.0.0.0/0"
+      NatGatewayId: !Ref NATazC
+
+# Route Table Associate
+  AssociatePublicRouteTableA:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref PublicSubnetA 
+      RouteTableId: !Ref PublicRouteTableA
+
+  AssociatePublicRouteTableC: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref PublicSubnetC 
+      RouteTableId: !Ref PublicRouteTableC
+
+  AssociatePrivateRouteTableA: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref PrivateSubnetA
+      RouteTableId: !Ref PrivateRouteTableA 
+
+  AssociatePrivateRouteTableC:  
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref PrivateSubnetC
+      RouteTableId: !Ref PrivateRouteTableC
+
+Outputs:
+
+  VpcIdOfMainVpc:
+    Description: "VPC Id"
+    Value: !Ref MainVpc
+    Export:
+      Name: "CC-VPC"
+  
+  SubnetIdOfPublicSubnetA:
+    Description: "Subnet Id"
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: "CC-PUBLIC-SUBNET-A"
+
+  SubnetIdOfPublicSubnetC:
+    Description: "Subnet Id"
+    Value: !Ref PublicSubnetC
+    Export:
+      Name: "CC-PUBLIC-SUBNET-C"
+
+  SubnetIdOfPrivateSubnetA:
+    Description: "Subnet Id"
+    Value: !Ref PrivateSubnetA
+    Export:
+      Name: "CC-PRIVATE-SUBNET-A"
+  
+  SubnetIdOfPrivateSubnetC:
+    Description: "Subnet Id"
+    Value: !Ref PrivateSubnetC
+    Export:
+      Name: "CC-PRIVATE-SUBNET-C"
