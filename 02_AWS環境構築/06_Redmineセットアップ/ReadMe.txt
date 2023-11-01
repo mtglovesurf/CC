@@ -102,7 +102,10 @@ curl -X PUT -H "Content-Type: application/json" -H "X-Redmine-API-Key: ※APIア
 aws ec2-instance-connect ssh --instance-id ※インスタンスID --connection-type eice
 sudo docker exec -it con_web /bin/bash
 
-2. cronを有効にし、メール連携ジョブを登録する。
+2. タイムゾーン設定
+ln -sf /usr/share/zoneinfo/Japan /etc/localtime
+
+3. cronを有効にし、メール連携ジョブを登録する。
 service cron start
 crontab -e
 --------------------------------------------------------------------------------------------------
@@ -113,6 +116,6 @@ PATH=/usr/local/bundle/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sb
 * *	* * *	/usr/src/redmine/mail_renkei.sh >> /usr/src/redmine/log/mail_renkei.log 2>&1
 --------------------------------------------------------------------------------------------------
 
-3. support@zukosha-it.comにメールを送る
+4. support@zukosha-it.comにメールを送る
 ※１分後にチケットが発行されていることを確認する
 
